@@ -88,6 +88,7 @@ class Custom_WC_Currency_Switcher {
         // WooCommerce price filters
         add_filter('woocommerce_currency', array($this, 'change_currency_symbol'));
         add_filter('woocommerce_currency_symbol', array($this, 'change_currency_symbol_display'), 10, 2);
+        add_filter('woocommerce_price_format', array($this, 'change_price_format'), 10, 1);
         add_filter('raw_woocommerce_price', array($this, 'convert_price'), 10, 1);
         add_filter('woocommerce_product_get_price', array($this, 'convert_product_price'), 10, 2);
         add_filter('woocommerce_product_get_regular_price', array($this, 'convert_product_price'), 10, 2);
@@ -655,6 +656,22 @@ class Custom_WC_Currency_Switcher {
     public function change_currency_symbol_display($currency_symbol, $currency) {
         $current = $this->get_current_currency();
         return $current ? $current->currency_symbol : $currency_symbol;
+    }
+    
+    /**
+     * Change price format to add proper spacing
+     */
+    public function change_price_format($format) {
+        $current = $this->get_current_currency();
+        
+        // If we have a custom currency, ensure proper spacing
+        if ($current) {
+            // Add space between symbol and price
+            // Format: %1$s = currency symbol, %2$s = price
+            $format = '%1$s %2$s';
+        }
+        
+        return $format;
     }
     
     /**
