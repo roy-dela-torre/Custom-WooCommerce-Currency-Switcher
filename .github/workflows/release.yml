@@ -1,0 +1,41 @@
+name: Create Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+        body: |
+          ## Changes in this Release
+          
+          See [CHANGELOG.md](https://github.com/roy-dela-torre/Custom-WooCommerce-Currency-Switcher/blob/main/CHANGELOG.md) for details.
+          
+          ## Installation
+          
+          1. Download the plugin ZIP file
+          2. Go to WordPress Admin → Plugins → Add New
+          3. Click "Upload Plugin"
+          4. Choose the downloaded file and click "Install Now"
+          5. Activate the plugin
+          
+          ## Update from WordPress Admin
+          
+          If you already have the plugin installed, you can update it directly from the Plugins page in WordPress admin!

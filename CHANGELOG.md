@@ -2,6 +2,28 @@
 
 All notable changes to the Custom WooCommerce Currency Switcher plugin will be documented in this file.
 
+## [1.0.1] - 2025-01-01
+
+### Added
+- **Automatic Updates from GitHub** - Plugin now checks for and installs updates directly from GitHub repository
+- GitHub updater class for seamless updates
+- Cookie fallback for currency selection (30-day persistence)
+- Better session handling with WordPress init hook
+- Console logging for debugging currency switches
+- Database table existence check with manual creation option
+- Better error messages for database operations
+
+### Fixed
+- Currency switcher now properly persists selection across page loads
+- Session starting at correct time in WordPress lifecycle
+- Form submission error messages now display immediately
+- Currency selection storage improved with dual session + cookie approach
+
+### Changed
+- Improved AJAX response handling with detailed console logs
+- Enhanced currency retrieval with cookie fallback
+- Better admin page error handling and user feedback
+
 ## [1.0.0] - 2025-01-01
 
 ### Added

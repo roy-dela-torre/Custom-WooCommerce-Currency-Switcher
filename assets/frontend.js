@@ -20,6 +20,8 @@ jQuery(document).ready(function($) {
         var currencyId = $(this).data('id');
         var currencyText = $(this).find('.cwc-symbol').text() + ' ' + $(this).find('.cwc-code').text().replace('(', '').replace(')', '');
         
+        console.log('Switching to currency ID:', currencyId);
+        
         // Show loading state
         $('.cwc-current-currency').html('<span class="cwc-loading">...</span>');
         
@@ -33,21 +35,32 @@ jQuery(document).ready(function($) {
                 nonce: cwc_frontend.nonce
             },
             success: function(response) {
+                console.log('AJAX Response:', response);
+                
                 if (response.success) {
+                    console.log('Currency switched successfully to ID:', response.data.currency_id);
+                    
                     // Update display
                     $('.cwc-current-currency').text(currencyText);
                     $('.cwc-switcher-dropdown').slideUp(200);
                     
                     // Reload page to update all prices
-                    location.reload();
+                    setTimeout(function() {
+                        location.reload();
+                    }, 300);
                 } else {
+                    console.error('Error switching currency:', response.data.message);
                     alert(response.data.message || 'Error switching currency');
                     $('.cwc-current-currency').text(currencyText);
                 }
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
                 alert('Error switching currency. Please try again.');
                 location.reload();
+            }
+        });
+    });
             }
         });
     });

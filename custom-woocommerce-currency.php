@@ -3,7 +3,7 @@
  * Plugin Name: Custom WooCommerce Currency Switcher
  * Plugin URI: https://portfolio-react-tailwind-gilt.vercel.app/
  * Description: Allow users to switch currencies with custom currency management in admin dashboard. Applies to products, cart, checkout, and emails.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Chusie Kokoro
  * Author URI: https://portfolio-react-tailwind-gilt.vercel.app/
  * Text Domain: custom-wc-currency
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CWC_VERSION', '1.0.0');
+define('CWC_VERSION', '1.0.1');
 define('CWC_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('CWC_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('CWC_PLUGIN_BASENAME', plugin_basename(__FILE__));
@@ -32,6 +32,7 @@ class Custom_WC_Currency_Switcher {
     
     private static $instance = null;
     private $table_name;
+    private $github_repo = 'roy-dela-torre/Custom-WooCommerce-Currency-Switcher';
     
     /**
      * Get singleton instance
@@ -66,10 +67,8 @@ class Custom_WC_Currency_Switcher {
             return;
         }
         
-        // Start session for currency storage
-        if (!session_id()) {
-            session_start();
-        }
+        // Start session for currency storage (use init hook to ensure it's early enough)
+        add_action('init', array($this, 'start_session'), 1);
         
         // Load admin functionality
         if (is_admin()) {
@@ -162,6 +161,15 @@ class Custom_WC_Currency_Switcher {
     }
     
     /**
+     * Start session
+     */
+    public function start_session() {
+        if (!session_id() && !headers_sent()) {
+            session_start();
+        }
+    }
+    
+    /**
      * WooCommerce missing notice
      */
     public function woocommerce_missing_notice() {
@@ -202,6 +210,12 @@ class Custom_WC_Currency_Switcher {
     public function admin_page() {
         global $wpdb;
         
+        // Handle manual table creation
+        if (isset($_GET['create_table']) && check_admin_referer('cwc_create_table_nonce', '_wpnonce')) {
+            $this->activate();
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Database table created/verified successfully!', 'custom-wc-currency') . '</p></div>';
+        }
+        
         // Handle form submissions
         if (isset($_POST['cwc_action']) && check_admin_referer('cwc_action_nonce')) {
             if ($_POST['cwc_action'] === 'add_currency') {
@@ -209,6 +223,24 @@ class Custom_WC_Currency_Switcher {
             } elseif ($_POST['cwc_action'] === 'edit_currency') {
                 $this->update_currency();
             }
+        }
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$this->table_name}'") === $this->table_name;
+        
+        if (!$table_exists) {
+            ?>
+            <div class="wrap">
+                <h1><?php _e('Currency Switcher', 'custom-wc-currency'); ?></h1>
+                <div class="notice notice-error">
+                    <p><?php _e('Database table does not exist. Please create it first.', 'custom-wc-currency'); ?></p>
+                </div>
+                <p>
+                    <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=cwc-currencies&create_table=1'), 'cwc_create_table_nonce'); ?>" class="button button-primary"><?php _e('Create Database Table', 'custom-wc-currency'); ?></a>
+                </p>
+            </div>
+            <?php
+            return;
         }
         
         // Get all currencies
@@ -219,7 +251,16 @@ class Custom_WC_Currency_Switcher {
             <h1 class="wp-heading-inline"><?php _e('Currency Switcher', 'custom-wc-currency'); ?></h1>
             <a href="<?php echo admin_url('admin.php?page=cwc-add-currency'); ?>" class="page-title-action"><?php _e('Add New', 'custom-wc-currency'); ?></a>
             
-            <table class="wp-list-table widefat fixed striped">
+            <?php if (empty($currencies)) : ?>
+                <div class="notice notice-warning" style="margin-top: 20px;">
+                    <p><?php _e('No currencies found. Click "Add New" to add your first currency, or recreate the database table if needed.', 'custom-wc-currency'); ?></p>
+                    <p>
+                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=cwc-currencies&create_table=1'), 'cwc_create_table_nonce'); ?>" class="button"><?php _e('Recreate Database Table', 'custom-wc-currency'); ?></a>
+                    </p>
+                </div>
+            <?php endif; ?>
+            
+            <table class="wp-list-table widefat fixed striped" style="margin-top: 20px;">
                 <thead>
                     <tr>
                         <th><?php _e('ID', 'custom-wc-currency'); ?></th>
@@ -398,13 +439,10 @@ class Custom_WC_Currency_Switcher {
         );
         
         if ($result) {
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency added successfully!', 'custom-wc-currency') . '</p></div>';
-            });
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency added successfully!', 'custom-wc-currency') . '</p></div>';
         } else {
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-error is-dismissible"><p>' . __('Error adding currency.', 'custom-wc-currency') . '</p></div>';
-            });
+            $error_message = $wpdb->last_error ? $wpdb->last_error : __('Unknown database error', 'custom-wc-currency');
+            echo '<div class="notice notice-error is-dismissible"><p>' . sprintf(__('Error adding currency: %s', 'custom-wc-currency'), esc_html($error_message)) . '</p></div>';
         }
     }
     
@@ -448,13 +486,10 @@ class Custom_WC_Currency_Switcher {
         );
         
         if ($result !== false) {
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency updated successfully!', 'custom-wc-currency') . '</p></div>';
-            });
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency updated successfully!', 'custom-wc-currency') . '</p></div>';
         } else {
-            add_action('admin_notices', function() {
-                echo '<div class="notice notice-error is-dismissible"><p>' . __('Error updating currency.', 'custom-wc-currency') . '</p></div>';
-            });
+            $error_message = $wpdb->last_error ? $wpdb->last_error : __('No changes made or unknown error', 'custom-wc-currency');
+            echo '<div class="notice notice-error is-dismissible"><p>' . sprintf(__('Error updating currency: %s', 'custom-wc-currency'), esc_html($error_message)) . '</p></div>';
         }
     }
     
@@ -534,8 +569,16 @@ class Custom_WC_Currency_Switcher {
         $currency_id = intval($_POST['currency_id']);
         
         if ($currency_id > 0) {
+            // Store in session
             $_SESSION['cwc_selected_currency'] = $currency_id;
-            wp_send_json_success(array('message' => __('Currency switched successfully', 'custom-wc-currency')));
+            
+            // Also store in cookie as backup (30 days)
+            setcookie('cwc_selected_currency', $currency_id, time() + (30 * 24 * 60 * 60), '/');
+            
+            wp_send_json_success(array(
+                'message' => __('Currency switched successfully', 'custom-wc-currency'),
+                'currency_id' => $currency_id
+            ));
         } else {
             wp_send_json_error(array('message' => __('Invalid currency', 'custom-wc-currency')));
         }
@@ -576,7 +619,15 @@ class Custom_WC_Currency_Switcher {
     private function get_current_currency() {
         global $wpdb;
         
+        // Try to get from session first
         $currency_id = isset($_SESSION['cwc_selected_currency']) ? intval($_SESSION['cwc_selected_currency']) : 0;
+        
+        // If not in session, try cookie
+        if ($currency_id == 0 && isset($_COOKIE['cwc_selected_currency'])) {
+            $currency_id = intval($_COOKIE['cwc_selected_currency']);
+            // Store in session for this request
+            $_SESSION['cwc_selected_currency'] = $currency_id;
+        }
         
         if ($currency_id > 0) {
             $currency = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$this->table_name} WHERE id = %d AND status = 1", $currency_id));
@@ -697,6 +748,149 @@ class Custom_WC_Currency_Switcher {
         }
     }
 }
+
+/**
+ * GitHub Updater Class
+ */
+class CWC_GitHub_Updater {
+    
+    private $file;
+    private $plugin;
+    private $basename;
+    private $active;
+    private $github_repo;
+    private $github_response;
+    
+    public function __construct($file) {
+        $this->file = $file;
+        $this->plugin = get_plugin_data($this->file);
+        $this->basename = plugin_basename($this->file);
+        $this->active = is_plugin_active($this->basename);
+        $this->github_repo = 'roy-dela-torre/Custom-WooCommerce-Currency-Switcher';
+    }
+    
+    /**
+     * Get GitHub release info
+     */
+    private function get_github_release_info() {
+        if (!empty($this->github_response)) {
+            return;
+        }
+        
+        $url = "https://api.github.com/repos/{$this->github_repo}/releases/latest";
+        
+        $response = wp_remote_get($url, array(
+            'timeout' => 10,
+            'headers' => array(
+                'Accept' => 'application/vnd.github.v3+json'
+            )
+        ));
+        
+        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
+            return false;
+        }
+        
+        $this->github_response = json_decode(wp_remote_retrieve_body($response));
+    }
+    
+    /**
+     * Check for plugin update
+     */
+    public function check_update($transient) {
+        if (empty($transient->checked)) {
+            return $transient;
+        }
+        
+        $this->get_github_release_info();
+        
+        if (!$this->github_response) {
+            return $transient;
+        }
+        
+        // Get version without 'v' prefix
+        $latest_version = ltrim($this->github_response->tag_name, 'v');
+        $current_version = $this->plugin['Version'];
+        
+        // Compare versions
+        if (version_compare($current_version, $latest_version, '<')) {
+            $plugin = array(
+                'slug' => dirname($this->basename),
+                'new_version' => $latest_version,
+                'url' => $this->plugin['PluginURI'],
+                'package' => $this->github_response->zipball_url,
+                'tested' => '6.4'
+            );
+            
+            $transient->response[$this->basename] = (object) $plugin;
+        }
+        
+        return $transient;
+    }
+    
+    /**
+     * Plugin information for update screen
+     */
+    public function plugin_info($false, $action, $response) {
+        if ($action !== 'plugin_information') {
+            return $false;
+        }
+        
+        if ($response->slug !== dirname($this->basename)) {
+            return $false;
+        }
+        
+        $this->get_github_release_info();
+        
+        if (!$this->github_response) {
+            return $false;
+        }
+        
+        $latest_version = ltrim($this->github_response->tag_name, 'v');
+        
+        $plugin = array(
+            'name' => $this->plugin['Name'],
+            'slug' => dirname($this->basename),
+            'version' => $latest_version,
+            'author' => $this->plugin['AuthorName'],
+            'author_profile' => $this->plugin['AuthorURI'],
+            'homepage' => $this->plugin['PluginURI'],
+            'requires' => '5.8',
+            'tested' => '6.4',
+            'downloaded' => 0,
+            'last_updated' => $this->github_response->published_at,
+            'sections' => array(
+                'description' => $this->plugin['Description'],
+                'changelog' => !empty($this->github_response->body) ? $this->github_response->body : 'No changelog available.'
+            ),
+            'download_link' => $this->github_response->zipball_url
+        );
+        
+        return (object) $plugin;
+    }
+    
+    /**
+     * After install hook
+     */
+    public function after_install($response, $hook_extra, $result) {
+        global $wp_filesystem;
+        
+        $install_directory = plugin_dir_path(WP_PLUGIN_DIR . '/' . $this->basename);
+        $wp_filesystem->move($result['destination'], $install_directory);
+        $result['destination'] = $install_directory;
+        
+        if ($this->active) {
+            activate_plugin($this->basename);
+        }
+        
+        return $result;
+    }
+}
+
+// Initialize updater
+$cwc_updater = new CWC_GitHub_Updater(__FILE__);
+add_filter('pre_set_site_transient_update_plugins', array($cwc_updater, 'check_update'));
+add_filter('plugins_api', array($cwc_updater, 'plugin_info'), 10, 3);
+add_filter('upgrader_post_install', array($cwc_updater, 'after_install'), 10, 3);
 
 // Initialize plugin
 function cwc_init() {
