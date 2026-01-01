@@ -85,11 +85,12 @@ class Custom_WC_Currency_Switcher {
         add_action('wp_ajax_nopriv_cwc_switch_currency', array($this, 'ajax_switch_currency'));
         add_action('wp_ajax_cwc_delete_currency', array($this, 'ajax_delete_currency'));
         
-        // WooCommerce price filters
+        // WooCommerce price filters - Display only
         add_filter('woocommerce_currency', array($this, 'change_currency_symbol'));
         add_filter('woocommerce_currency_symbol', array($this, 'change_currency_symbol_display'), 10, 2);
         add_filter('woocommerce_price_format', array($this, 'change_price_format'), 10, 1);
-        add_filter('raw_woocommerce_price', array($this, 'convert_price'), 10, 1);
+        
+        // Convert display prices (product pages, archives)
         add_filter('woocommerce_product_get_price', array($this, 'convert_product_price'), 10, 2);
         add_filter('woocommerce_product_get_regular_price', array($this, 'convert_product_price'), 10, 2);
         add_filter('woocommerce_product_get_sale_price', array($this, 'convert_product_price'), 10, 2);
@@ -97,7 +98,11 @@ class Custom_WC_Currency_Switcher {
         add_filter('woocommerce_product_variation_get_regular_price', array($this, 'convert_product_price'), 10, 2);
         add_filter('woocommerce_product_variation_get_sale_price', array($this, 'convert_product_price'), 10, 2);
         
-        // Cart and checkout
+        // Store original price in cart, convert dynamically
+        add_action('woocommerce_add_to_cart', array($this, 'store_original_price_in_cart'), 10, 6);
+        add_action('woocommerce_before_calculate_totals', array($this, 'convert_cart_prices'), 20);
+        
+        // Cart and checkout display
         add_filter('woocommerce_cart_item_price', array($this, 'convert_cart_item_price'), 10, 3);
         add_filter('woocommerce_cart_item_subtotal', array($this, 'convert_cart_item_subtotal'), 10, 3);
         
@@ -675,9 +680,14 @@ class Custom_WC_Currency_Switcher {
     }
     
     /**
-     * Convert price
+     * Convert product price for display (product pages, archives)
      */
-    public function convert_price($price) {
+    public function convert_product_price($price, $product) {
+        // Skip conversion in cart/checkout to prevent double conversion
+        if (is_cart() || is_checkout()) {
+            return $price;
+        }
+        
         if (empty($price) || !is_numeric($price)) {
             return $price;
         }
@@ -692,20 +702,66 @@ class Custom_WC_Currency_Switcher {
     }
     
     /**
-     * Convert product price
+     * Store original price when adding to cart
      */
-    public function convert_product_price($price, $product) {
-        if (empty($price) || !is_numeric($price)) {
-            return $price;
+    public function store_original_price_in_cart($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data) {
+        $cart = WC()->cart->get_cart();
+        
+        if (isset($cart[$cart_item_key])) {
+            $product = wc_get_product($variation_id ? $variation_id : $product_id);
+            
+            // Remove our filter temporarily to get the unconverted base price
+            remove_filter('woocommerce_product_get_price', array($this, 'convert_product_price'), 10);
+            remove_filter('woocommerce_product_get_regular_price', array($this, 'convert_product_price'), 10);
+            remove_filter('woocommerce_product_get_sale_price', array($this, 'convert_product_price'), 10);
+            
+            $base_price = $product->get_price();
+            
+            // Re-add filters
+            add_filter('woocommerce_product_get_price', array($this, 'convert_product_price'), 10, 2);
+            add_filter('woocommerce_product_get_regular_price', array($this, 'convert_product_price'), 10, 2);
+            add_filter('woocommerce_product_get_sale_price', array($this, 'convert_product_price'), 10, 2);
+            
+            // Store original base price (in default currency)
+            WC()->cart->cart_contents[$cart_item_key]['cwc_base_price'] = $base_price;
+        }
+    }
+    
+    /**
+     * Convert cart prices based on stored base prices
+     */
+    public function convert_cart_prices($cart) {
+        if (is_admin() && !defined('DOING_AJAX')) {
+            return;
         }
         
         $current = $this->get_current_currency();
         
-        if ($current && $current->multiplier != 1) {
-            return $price * $current->multiplier;
+        foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+            // Get the base price (original unconverted price)
+            if (isset($cart_item['cwc_base_price'])) {
+                $base_price = $cart_item['cwc_base_price'];
+            } else {
+                // Fallback: get product base price without conversion
+                $product = $cart_item['data'];
+                remove_filter('woocommerce_product_get_price', array($this, 'convert_product_price'), 10);
+                $base_price = $product->get_price();
+                add_filter('woocommerce_product_get_price', array($this, 'convert_product_price'), 10, 2);
+                
+                // Store for future use
+                WC()->cart->cart_contents[$cart_item_key]['cwc_base_price'] = $base_price;
+            }
+            
+            // Apply current currency conversion to base price
+            if ($current && $current->multiplier != 1) {
+                $converted_price = $base_price * $current->multiplier;
+            } else {
+                $converted_price = $base_price;
+            }
+            
+            // Set the converted price in cart
+            $cart_item['data']->set_price($converted_price);
         }
-        
-        return $price;
     }
     
     /**
