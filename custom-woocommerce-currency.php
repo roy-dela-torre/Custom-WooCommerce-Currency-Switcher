@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Multi-Currency Switcher for WooCommerce
- * Plugin URI: https://portfolio-react-tailwind-gilt.vercel.app/
+ * Plugin URI: https://github.com/roy-dela-torre/Custom-WooCommerce-Currency-Switcher
  * Description: Allow users to switch currencies with custom currency management in admin dashboard. Applies to products, cart, checkout, and emails.
  * Version: 1.0.3
  * Author: Chusie Kokoro
