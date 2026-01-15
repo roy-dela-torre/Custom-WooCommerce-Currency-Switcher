@@ -183,7 +183,7 @@ class Custom_WC_Currency_Switcher {
     public function woocommerce_missing_notice() {
         ?>
         <div class="notice notice-error">
-            <p><?php _e('Custom WooCommerce Currency Switcher requires WooCommerce to be installed and active.', 'custom-wc-currency'); ?></p>
+            <p><?php _e('Custom WooCommerce Currency Switcher requires WooCommerce to be installed and active.', 'multi-currency-switcher-for-woocommerce'); ?></p>
         </div>
         <?php
     }
@@ -193,8 +193,8 @@ class Custom_WC_Currency_Switcher {
      */
     public function add_admin_menu() {
         add_menu_page(
-            __('Currency Switcher', 'custom-wc-currency'),
-            __('Currency Switcher', 'custom-wc-currency'),
+            __('Currency Switcher', 'multi-currency-switcher-for-woocommerce'),
+            __('Currency Switcher', 'multi-currency-switcher-for-woocommerce'),
             'manage_options',
             'cwc-currencies',
             array($this, 'admin_page'),
@@ -204,8 +204,8 @@ class Custom_WC_Currency_Switcher {
         
         add_submenu_page(
             'cwc-currencies',
-            __('Add New Currency', 'custom-wc-currency'),
-            __('Add New', 'custom-wc-currency'),
+            __('Add New Currency', 'multi-currency-switcher-for-woocommerce'),
+            __('Add New', 'multi-currency-switcher-for-woocommerce'),
             'manage_options',
             'cwc-add-currency',
             array($this, 'add_currency_page')
@@ -221,7 +221,7 @@ class Custom_WC_Currency_Switcher {
         // Handle manual table creation
         if (isset($_GET['create_table']) && check_admin_referer('cwc_create_table_nonce', '_wpnonce')) {
             $this->activate();
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Database table created/verified successfully!', 'custom-wc-currency') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Database table created/verified successfully!', 'multi-currency-switcher-for-woocommerce') . '</p></div>';
         }
         
         // Handle form submissions
@@ -239,12 +239,12 @@ class Custom_WC_Currency_Switcher {
         if (!$table_exists) {
             ?>
             <div class="wrap">
-                <h1><?php _e('Currency Switcher', 'custom-wc-currency'); ?></h1>
+                <h1><?php _e('Currency Switcher', 'multi-currency-switcher-for-woocommerce'); ?></h1>
                 <div class="notice notice-error">
-                    <p><?php _e('Database table does not exist. Please create it first.', 'custom-wc-currency'); ?></p>
+                    <p><?php _e('Database table does not exist. Please create it first.', 'multi-currency-switcher-for-woocommerce'); ?></p>
                 </div>
                 <p>
-                    <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=cwc-currencies&create_table=1'), 'cwc_create_table_nonce'); ?>" class="button button-primary"><?php _e('Create Database Table', 'custom-wc-currency'); ?></a>
+                    <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=cwc-currencies&create_table=1'), 'cwc_create_table_nonce'); ?>" class="button button-primary"><?php _e('Create Database Table', 'multi-currency-switcher-for-woocommerce'); ?></a>
                 </p>
             </div>
             <?php
@@ -256,14 +256,14 @@ class Custom_WC_Currency_Switcher {
         
         ?>
         <div class="wrap">
-            <h1 class="wp-heading-inline"><?php _e('Currency Switcher', 'custom-wc-currency'); ?></h1>
-            <a href="<?php echo admin_url('admin.php?page=cwc-add-currency'); ?>" class="page-title-action"><?php _e('Add New', 'custom-wc-currency'); ?></a>
+            <h1 class="wp-heading-inline"><?php _e('Currency Switcher', 'multi-currency-switcher-for-woocommerce'); ?></h1>
+            <a href="<?php echo admin_url('admin.php?page=cwc-add-currency'); ?>" class="page-title-action"><?php _e('Add New', 'multi-currency-switcher-for-woocommerce'); ?></a>
             
             <?php if (empty($currencies)) : ?>
                 <div class="notice notice-warning" style="margin-top: 20px;">
-                    <p><?php _e('No currencies found. Click "Add New" to add your first currency, or recreate the database table if needed.', 'custom-wc-currency'); ?></p>
+                    <p><?php _e('No currencies found. Click "Add New" to add your first currency, or recreate the database table if needed.', 'multi-currency-switcher-for-woocommerce'); ?></p>
                     <p>
-                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=cwc-currencies&create_table=1'), 'cwc_create_table_nonce'); ?>" class="button"><?php _e('Recreate Database Table', 'custom-wc-currency'); ?></a>
+                        <a href="<?php echo wp_nonce_url(admin_url('admin.php?page=cwc-currencies&create_table=1'), 'cwc_create_table_nonce'); ?>" class="button"><?php _e('Recreate Database Table', 'multi-currency-switcher-for-woocommerce'); ?></a>
                     </p>
                 </div>
             <?php endif; ?>
@@ -271,20 +271,20 @@ class Custom_WC_Currency_Switcher {
             <table class="wp-list-table widefat fixed striped" style="margin-top: 20px;">
                 <thead>
                     <tr>
-                        <th><?php _e('ID', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Currency Name', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Symbol', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Code', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Multiplier', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Default', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Status', 'custom-wc-currency'); ?></th>
-                        <th><?php _e('Actions', 'custom-wc-currency'); ?></th>
+                        <th><?php _e('ID', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Currency Name', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Symbol', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Code', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Multiplier', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Default', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Status', 'multi-currency-switcher-for-woocommerce'); ?></th>
+                        <th><?php _e('Actions', 'multi-currency-switcher-for-woocommerce'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($currencies)) : ?>
                         <tr>
-                            <td colspan="8"><?php _e('No currencies found.', 'custom-wc-currency'); ?></td>
+                            <td colspan="8"><?php _e('No currencies found.', 'multi-currency-switcher-for-woocommerce'); ?></td>
                         </tr>
                     <?php else : ?>
                         <?php foreach ($currencies as $currency) : ?>
@@ -295,11 +295,11 @@ class Custom_WC_Currency_Switcher {
                                 <td><?php echo esc_html($currency->currency_code); ?></td>
                                 <td><?php echo esc_html($currency->multiplier); ?></td>
                                 <td><?php echo $currency->is_default ? '✓' : ''; ?></td>
-                                <td><?php echo $currency->status ? __('Active', 'custom-wc-currency') : __('Inactive', 'custom-wc-currency'); ?></td>
+                                <td><?php echo $currency->status ? __('Active', 'multi-currency-switcher-for-woocommerce') : __('Inactive', 'multi-currency-switcher-for-woocommerce'); ?></td>
                                 <td>
-                                    <a href="<?php echo admin_url('admin.php?page=cwc-add-currency&edit=' . $currency->id); ?>" class="button button-small"><?php _e('Edit', 'custom-wc-currency'); ?></a>
+                                    <a href="<?php echo admin_url('admin.php?page=cwc-add-currency&edit=' . $currency->id); ?>" class="button button-small"><?php _e('Edit', 'multi-currency-switcher-for-woocommerce'); ?></a>
                                     <?php if (!$currency->is_default) : ?>
-                                        <button class="button button-small cwc-delete-currency" data-id="<?php echo esc_attr($currency->id); ?>"><?php _e('Delete', 'custom-wc-currency'); ?></button>
+                                        <button class="button button-small cwc-delete-currency" data-id="<?php echo esc_attr($currency->id); ?>"><?php _e('Delete', 'multi-currency-switcher-for-woocommerce'); ?></button>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -326,14 +326,14 @@ class Custom_WC_Currency_Switcher {
             $currency_data = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$this->table_name} WHERE id = %d", $currency_id));
             
             if (!$currency_data) {
-                echo '<div class="notice notice-error"><p>' . __('Currency not found.', 'custom-wc-currency') . '</p></div>';
+                echo '<div class="notice notice-error"><p>' . __('Currency not found.', 'multi-currency-switcher-for-woocommerce') . '</p></div>';
                 return;
             }
         }
         
         ?>
         <div class="wrap">
-            <h1><?php echo $edit_mode ? __('Edit Currency', 'custom-wc-currency') : __('Add New Currency', 'custom-wc-currency'); ?></h1>
+            <h1><?php echo $edit_mode ? __('Edit Currency', 'multi-currency-switcher-for-woocommerce') : __('Add New Currency', 'multi-currency-switcher-for-woocommerce'); ?></h1>
             
             <form method="post" action="<?php echo admin_url('admin.php?page=cwc-currencies'); ?>">
                 <?php wp_nonce_field('cwc_action_nonce'); ?>
@@ -345,65 +345,65 @@ class Custom_WC_Currency_Switcher {
                 <table class="form-table">
                     <tr>
                         <th scope="row">
-                            <label for="currency_name"><?php _e('Currency Name', 'custom-wc-currency'); ?> *</label>
+                            <label for="currency_name"><?php _e('Currency Name', 'multi-currency-switcher-for-woocommerce'); ?> *</label>
                         </th>
                         <td>
                             <input type="text" name="currency_name" id="currency_name" class="regular-text" value="<?php echo $edit_mode ? esc_attr($currency_data->currency_name) : ''; ?>" required>
-                            <p class="description"><?php _e('Example: US Dollar, Euro, British Pound', 'custom-wc-currency'); ?></p>
+                            <p class="description"><?php _e('Example: US Dollar, Euro, British Pound', 'multi-currency-switcher-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="currency_symbol"><?php _e('Currency Symbol', 'custom-wc-currency'); ?> *</label>
+                            <label for="currency_symbol"><?php _e('Currency Symbol', 'multi-currency-switcher-for-woocommerce'); ?> *</label>
                         </th>
                         <td>
                             <input type="text" name="currency_symbol" id="currency_symbol" class="regular-text" value="<?php echo $edit_mode ? esc_attr($currency_data->currency_symbol) : ''; ?>" required>
-                            <p class="description"><?php _e('Example: $, €, £', 'custom-wc-currency'); ?></p>
+                            <p class="description"><?php _e('Example: $, €, £', 'multi-currency-switcher-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="currency_code"><?php _e('Currency Code', 'custom-wc-currency'); ?> *</label>
+                            <label for="currency_code"><?php _e('Currency Code', 'multi-currency-switcher-for-woocommerce'); ?> *</label>
                         </th>
                         <td>
                             <input type="text" name="currency_code" id="currency_code" class="regular-text" value="<?php echo $edit_mode ? esc_attr($currency_data->currency_code) : ''; ?>" required maxlength="10">
-                            <p class="description"><?php _e('Example: USD, EUR, GBP (3-letter ISO code)', 'custom-wc-currency'); ?></p>
+                            <p class="description"><?php _e('Example: USD, EUR, GBP (3-letter ISO code)', 'multi-currency-switcher-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="multiplier"><?php _e('Multiplier', 'custom-wc-currency'); ?> *</label>
+                            <label for="multiplier"><?php _e('Multiplier', 'multi-currency-switcher-for-woocommerce'); ?> *</label>
                         </th>
                         <td>
                             <input type="number" name="multiplier" id="multiplier" class="regular-text" value="<?php echo $edit_mode ? esc_attr($currency_data->multiplier) : '1.000000'; ?>" step="0.000001" min="0" required>
-                            <p class="description"><?php _e('Conversion rate from default currency. Example: If 1 USD = 0.85 EUR, enter 0.85', 'custom-wc-currency'); ?></p>
+                            <p class="description"><?php _e('Conversion rate from default currency. Example: If 1 USD = 0.85 EUR, enter 0.85', 'multi-currency-switcher-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="is_default"><?php _e('Set as Default', 'custom-wc-currency'); ?></label>
+                            <label for="is_default"><?php _e('Set as Default', 'multi-currency-switcher-for-woocommerce'); ?></label>
                         </th>
                         <td>
                             <input type="checkbox" name="is_default" id="is_default" value="1" <?php echo ($edit_mode && $currency_data->is_default) ? 'checked' : ''; ?>>
-                            <p class="description"><?php _e('Make this the default currency', 'custom-wc-currency'); ?></p>
+                            <p class="description"><?php _e('Make this the default currency', 'multi-currency-switcher-for-woocommerce'); ?></p>
                         </td>
                     </tr>
                     <tr>
                         <th scope="row">
-                            <label for="status"><?php _e('Status', 'custom-wc-currency'); ?></label>
+                            <label for="status"><?php _e('Status', 'multi-currency-switcher-for-woocommerce'); ?></label>
                         </th>
                         <td>
                             <select name="status" id="status">
-                                <option value="1" <?php echo ($edit_mode && $currency_data->status == 1) ? 'selected' : ''; ?>><?php _e('Active', 'custom-wc-currency'); ?></option>
-                                <option value="0" <?php echo ($edit_mode && $currency_data->status == 0) ? 'selected' : ''; ?>><?php _e('Inactive', 'custom-wc-currency'); ?></option>
+                                <option value="1" <?php echo ($edit_mode && $currency_data->status == 1) ? 'selected' : ''; ?>><?php _e('Active', 'multi-currency-switcher-for-woocommerce'); ?></option>
+                                <option value="0" <?php echo ($edit_mode && $currency_data->status == 0) ? 'selected' : ''; ?>><?php _e('Inactive', 'multi-currency-switcher-for-woocommerce'); ?></option>
                             </select>
                         </td>
                     </tr>
                 </table>
                 
                 <p class="submit">
-                    <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php echo $edit_mode ? __('Update Currency', 'custom-wc-currency') : __('Add Currency', 'custom-wc-currency'); ?>">
-                    <a href="<?php echo admin_url('admin.php?page=cwc-currencies'); ?>" class="button"><?php _e('Cancel', 'custom-wc-currency'); ?></a>
+                    <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php echo $edit_mode ? __('Update Currency', 'multi-currency-switcher-for-woocommerce') : __('Add Currency', 'multi-currency-switcher-for-woocommerce'); ?>">
+                    <a href="<?php echo admin_url('admin.php?page=cwc-currencies'); ?>" class="button"><?php _e('Cancel', 'multi-currency-switcher-for-woocommerce'); ?></a>
                 </p>
             </form>
         </div>
@@ -447,10 +447,10 @@ class Custom_WC_Currency_Switcher {
         );
         
         if ($result) {
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency added successfully!', 'custom-wc-currency') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency added successfully!', 'multi-currency-switcher-for-woocommerce') . '</p></div>';
         } else {
-            $error_message = $wpdb->last_error ? $wpdb->last_error : __('Unknown database error', 'custom-wc-currency');
-            echo '<div class="notice notice-error is-dismissible"><p>' . sprintf(__('Error adding currency: %s', 'custom-wc-currency'), esc_html($error_message)) . '</p></div>';
+            $error_message = $wpdb->last_error ? $wpdb->last_error : __('Unknown database error', 'multi-currency-switcher-for-woocommerce');
+            echo '<div class="notice notice-error is-dismissible"><p>' . sprintf(__('Error adding currency: %s', 'multi-currency-switcher-for-woocommerce'), esc_html($error_message)) . '</p></div>';
         }
     }
     
@@ -494,10 +494,10 @@ class Custom_WC_Currency_Switcher {
         );
         
         if ($result !== false) {
-            echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency updated successfully!', 'custom-wc-currency') . '</p></div>';
+            echo '<div class="notice notice-success is-dismissible"><p>' . __('Currency updated successfully!', 'multi-currency-switcher-for-woocommerce') . '</p></div>';
         } else {
-            $error_message = $wpdb->last_error ? $wpdb->last_error : __('No changes made or unknown error', 'custom-wc-currency');
-            echo '<div class="notice notice-error is-dismissible"><p>' . sprintf(__('Error updating currency: %s', 'custom-wc-currency'), esc_html($error_message)) . '</p></div>';
+            $error_message = $wpdb->last_error ? $wpdb->last_error : __('No changes made or unknown error', 'multi-currency-switcher-for-woocommerce');
+            echo '<div class="notice notice-error is-dismissible"><p>' . sprintf(__('Error updating currency: %s', 'multi-currency-switcher-for-woocommerce'), esc_html($error_message)) . '</p></div>';
         }
     }
     
@@ -513,7 +513,7 @@ class Custom_WC_Currency_Switcher {
         wp_localize_script('cwc-admin-js', 'cwc_admin', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('cwc_admin_nonce'),
-            'confirm_delete' => __('Are you sure you want to delete this currency?', 'custom-wc-currency')
+            'confirm_delete' => __('Are you sure you want to delete this currency?', 'multi-currency-switcher-for-woocommerce')
         ));
         
         wp_enqueue_style('cwc-admin-css', CWC_PLUGIN_URL . 'assets/admin.css', array(), CWC_VERSION);
@@ -584,11 +584,11 @@ class Custom_WC_Currency_Switcher {
             setcookie('cwc_selected_currency', $currency_id, time() + (30 * 24 * 60 * 60), '/');
             
             wp_send_json_success(array(
-                'message' => __('Currency switched successfully', 'custom-wc-currency'),
+                'message' => __('Currency switched successfully', 'multi-currency-switcher-for-woocommerce'),
                 'currency_id' => $currency_id
             ));
         } else {
-            wp_send_json_error(array('message' => __('Invalid currency', 'custom-wc-currency')));
+            wp_send_json_error(array('message' => __('Invalid currency', 'multi-currency-switcher-for-woocommerce')));
         }
     }
     
@@ -599,7 +599,7 @@ class Custom_WC_Currency_Switcher {
         check_ajax_referer('cwc_admin_nonce', 'nonce');
         
         if (!current_user_can('manage_options')) {
-            wp_send_json_error(array('message' => __('Permission denied', 'custom-wc-currency')));
+            wp_send_json_error(array('message' => __('Permission denied', 'multi-currency-switcher-for-woocommerce')));
         }
         
         global $wpdb;
@@ -612,12 +612,12 @@ class Custom_WC_Currency_Switcher {
             $result = $wpdb->delete($this->table_name, array('id' => $currency_id), array('%d'));
             
             if ($result) {
-                wp_send_json_success(array('message' => __('Currency deleted successfully', 'custom-wc-currency')));
+                wp_send_json_success(array('message' => __('Currency deleted successfully', 'multi-currency-switcher-for-woocommerce')));
             } else {
-                wp_send_json_error(array('message' => __('Error deleting currency', 'custom-wc-currency')));
+                wp_send_json_error(array('message' => __('Error deleting currency', 'multi-currency-switcher-for-woocommerce')));
             }
         } else {
-            wp_send_json_error(array('message' => __('Cannot delete default currency', 'custom-wc-currency')));
+            wp_send_json_error(array('message' => __('Cannot delete default currency', 'multi-currency-switcher-for-woocommerce')));
         }
     }
     
@@ -812,160 +812,17 @@ class Custom_WC_Currency_Switcher {
         
         if ($current && !$current->is_default) {
             if ($plain_text) {
-                echo "\n" . sprintf(__('Currency: %s (%s)', 'custom-wc-currency'), $current->currency_name, $current->currency_code) . "\n";
-                echo sprintf(__('Exchange Rate: %s', 'custom-wc-currency'), $current->multiplier) . "\n\n";
+                echo "\n" . sprintf(__('Currency: %s (%s)', 'multi-currency-switcher-for-woocommerce'), $current->currency_name, $current->currency_code) . "\n";
+                echo sprintf(__('Exchange Rate: %s', 'multi-currency-switcher-for-woocommerce'), $current->multiplier) . "\n\n";
             } else {
                 echo '<p style="margin: 10px 0; padding: 10px; background: #f5f5f5; border-left: 3px solid #0073aa;">';
-                echo '<strong>' . sprintf(__('Currency: %s (%s)', 'custom-wc-currency'), esc_html($current->currency_name), esc_html($current->currency_code)) . '</strong><br>';
-                echo sprintf(__('Exchange Rate: %s', 'custom-wc-currency'), esc_html($current->multiplier));
+                echo '<strong>' . sprintf(__('Currency: %s (%s)', 'multi-currency-switcher-for-woocommerce'), esc_html($current->currency_name), esc_html($current->currency_code)) . '</strong><br>';
+                echo sprintf(__('Exchange Rate: %s', 'multi-currency-switcher-for-woocommerce'), esc_html($current->multiplier));
                 echo '</p>';
             }
         }
     }
 }
-
-/**
- * GitHub Updater Class
- */
-class CWC_GitHub_Updater {
-    
-    private $file;
-    private $plugin;
-    private $basename;
-    private $active;
-    private $github_repo;
-    private $github_response;
-    
-    public function __construct($file) {
-        $this->file = $file;
-        $this->plugin = get_plugin_data($this->file);
-        $this->basename = plugin_basename($this->file);
-        $this->active = is_plugin_active($this->basename);
-        $this->github_repo = 'roy-dela-torre/Custom-WooCommerce-Currency-Switcher';
-    }
-    
-    /**
-     * Get GitHub release info
-     */
-    private function get_github_release_info() {
-        if (!empty($this->github_response)) {
-            return;
-        }
-        
-        $url = "https://api.github.com/repos/{$this->github_repo}/releases/latest";
-        
-        $response = wp_remote_get($url, array(
-            'timeout' => 10,
-            'headers' => array(
-                'Accept' => 'application/vnd.github.v3+json'
-            )
-        ));
-        
-        if (is_wp_error($response) || wp_remote_retrieve_response_code($response) != 200) {
-            return false;
-        }
-        
-        $this->github_response = json_decode(wp_remote_retrieve_body($response));
-    }
-    
-    /**
-     * Check for plugin update
-     */
-    public function check_update($transient) {
-        if (empty($transient->checked)) {
-            return $transient;
-        }
-        
-        $this->get_github_release_info();
-        
-        if (!$this->github_response) {
-            return $transient;
-        }
-        
-        // Get version without 'v' prefix
-        $latest_version = ltrim($this->github_response->tag_name, 'v');
-        $current_version = $this->plugin['Version'];
-        
-        // Compare versions
-        if (version_compare($current_version, $latest_version, '<')) {
-            $plugin = array(
-                'slug' => dirname($this->basename),
-                'new_version' => $latest_version,
-                'url' => $this->plugin['PluginURI'],
-                'package' => $this->github_response->zipball_url,
-                'tested' => '6.4'
-            );
-            
-            $transient->response[$this->basename] = (object) $plugin;
-        }
-        
-        return $transient;
-    }
-    
-    /**
-     * Plugin information for update screen
-     */
-    public function plugin_info($false, $action, $response) {
-        if ($action !== 'plugin_information') {
-            return $false;
-        }
-        
-        if ($response->slug !== dirname($this->basename)) {
-            return $false;
-        }
-        
-        $this->get_github_release_info();
-        
-        if (!$this->github_response) {
-            return $false;
-        }
-        
-        $latest_version = ltrim($this->github_response->tag_name, 'v');
-        
-        $plugin = array(
-            'name' => $this->plugin['Name'],
-            'slug' => dirname($this->basename),
-            'version' => $latest_version,
-            'author' => $this->plugin['AuthorName'],
-            'author_profile' => $this->plugin['AuthorURI'],
-            'homepage' => $this->plugin['PluginURI'],
-            'requires' => '5.8',
-            'tested' => '6.4',
-            'downloaded' => 0,
-            'last_updated' => $this->github_response->published_at,
-            'sections' => array(
-                'description' => $this->plugin['Description'],
-                'changelog' => !empty($this->github_response->body) ? $this->github_response->body : 'No changelog available.'
-            ),
-            'download_link' => $this->github_response->zipball_url
-        );
-        
-        return (object) $plugin;
-    }
-    
-    /**
-     * After install hook
-     */
-    public function after_install($response, $hook_extra, $result) {
-        global $wp_filesystem;
-        
-        $install_directory = plugin_dir_path(WP_PLUGIN_DIR . '/' . $this->basename);
-        $wp_filesystem->move($result['destination'], $install_directory);
-        $result['destination'] = $install_directory;
-        
-        if ($this->active) {
-            activate_plugin($this->basename);
-        }
-        
-        return $result;
-    }
-}
-
-// Initialize updater
-$cwc_updater = new CWC_GitHub_Updater(__FILE__);
-add_filter('pre_set_site_transient_update_plugins', array($cwc_updater, 'check_update'));
-add_filter('plugins_api', array($cwc_updater, 'plugin_info'), 10, 3);
-add_filter('upgrader_post_install', array($cwc_updater, 'after_install'), 10, 3);
 
 // Initialize plugin
 function cwc_init() {
