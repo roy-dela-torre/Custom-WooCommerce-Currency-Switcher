@@ -1,4 +1,4 @@
-=== Custom WooCommerce Currency Switcher ===
+=== Multi-Currency Switcher for WooCommerce ===
 Contributors: chusiekokoro
 Tags: woocommerce, currency, currency switcher, multi-currency, exchange rate
 Requires at least: 5.8
@@ -12,7 +12,7 @@ Allow customers to switch between multiple currencies with automatic price conve
 
 == Description ==
 
-Custom WooCommerce Currency Switcher enables your customers to view and purchase products in their preferred currency. Perfect for international stores wanting to provide a localized shopping experience.
+Multi-Currency Switcher for WooCommerce enables your customers to view and purchase products in their preferred currency. Perfect for international stores wanting to provide a localized shopping experience.
 
 = Features =
 
