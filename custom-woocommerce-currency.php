@@ -6,6 +6,8 @@
  * Version: 1.0.3
  * Author: Chusie Kokoro
  * Author URI: https://portfolio-react-tailwind-gilt.vercel.app/
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: custom-wc-currency
  * Domain Path: /languages
  * Requires at least: 5.8
